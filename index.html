@@ -1,0 +1,98 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Discard invalid input</title>
+	<script src="js/jquery.min.js"></script>
+	<link rel="stylesheet" title="csse" type="text/css" href="css/discard2.css">
+</head>
+<body>
+<div class="ui-container">
+	<h1 id="cascade">Discard</h1>
+	<p>The text field only accepts characters appearing in the word "foolproof". (The pattern is <code class="pattern">[flpro]+</code>) Anything else will be thrown away.</p>
+	<div id="input-container">
+		<input type="text" autofocus id="input" maxlength="23" pattern="[flpro]+">
+		<span id="output"></span>
+		<input type="submit" id="clear" class="hide" value="Clear">
+		<div class="illegal-container">
+			<span style="" class="illegal hide">
+				<span></span>
+			</span>
+		</div>
+	</div>
+</div>
+<div id="footer">
+	<a href="http://foolproof.me">foolproof.me</a>
+</div>
+
+
+<script type="text/javascript" charset="utf-8">
+
+	$(document).ready(function() {
+		var last_good_value = '';
+
+		illegal_container = $('.illegal-container').remove();
+
+		$('#clear').live('click', function(event) {
+			last_good_value = '';
+			$('#input').val('');
+			$('#output').text('');
+			$('#input')[0].focus();
+			$(this).removeClass('show')
+		});
+
+		$('#input').live('change, input', function(event) {
+			if ($(this).val() == '') {
+				$('#clear').removeClass('show');
+			}
+			else {
+				$('#clear').addClass('show');
+			};
+
+
+			var input = $(this).val();
+			var new_input = input.replace(last_good_value, '');
+
+			if ($(this)[0].validity.valid == false || $(this).val().length > $(this).attr('maxlength') - 1){
+				var new_clone = illegal_container.clone();
+				var illegal = new_clone.children();
+
+				new_clone.css({
+				  position: 'absolute',
+				  top: '6px',
+				  left: $('#output').outerWidth(),
+				  zIndex: '40'
+				});
+
+				$('#input-container').append( new_clone );
+				illegal.removeClass('hide').children().text( new_input );
+				setTimeout(function() {
+					illegal.addClass('animate');
+				}, 100);
+				setTimeout(function () {
+					new_clone.css('z-index', '3')
+				}, 250);
+				setTimeout(function() {
+					illegal.removeClass('animate').addClass('hide');
+					new_clone.remove();
+				}, 500);
+
+				$(this).val(last_good_value);
+				$('#input').blur();
+				setTimeout(function(){
+					$('#input').focus();
+				}, 100);
+			}
+			else {
+				last_good_value = $(this).val();
+				$('#output').text(last_good_value);
+			}
+
+		});
+
+	});
+
+</script>
+
+</body>
+</html>
